@@ -12,7 +12,7 @@ class TestGetMovies:
         assert "page" in response_data, "В ответе отсутствует ключ 'page'."
         assert isinstance(response_data["movies"], list), "Поле 'movies' не является списком."
 
-    def test_get_movies_with_filters(self, api_manager: ApiManager, super_admin_api_manager, movie_data):
+    def test_get_movies_with_filters(self, api_manager: ApiManager, super_admin_api_manager, movie_filters):
         """Тест получения списка фильмов с применением фильтров."""
         response = api_manager.movies_api.get_movies(params=movie_filters)
         response_data = response.json()
