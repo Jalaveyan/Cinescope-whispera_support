@@ -42,7 +42,7 @@ def test_user():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def registered_user(api_manager, test_user):
     """
     Фикстура для зарегистрированного пользователя.
@@ -51,7 +51,7 @@ def registered_user(api_manager, test_user):
     return test_user
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def authenticated_api_manager(api_manager, registered_user):
     """
     Фикстура для авторизованного API менеджера.
@@ -60,7 +60,7 @@ def authenticated_api_manager(api_manager, registered_user):
     return api_manager
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def super_admin_api_manager(api_manager):
     """
     Фикстура для авторизованного супер-админа.
@@ -70,7 +70,7 @@ def super_admin_api_manager(api_manager):
     return api_manager
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def movie_data():
     """
     Фикстура для генерации данных фильма.
@@ -78,7 +78,7 @@ def movie_data():
     return DataGenerator.generate_movie_data()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def movie_filters():
     """
     Фикстура для генерации параметров фильтрации.
@@ -86,7 +86,7 @@ def movie_filters():
     return DataGenerator.generate_movie_filters()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def created_movie(super_admin_api_manager, movie_data):
     """
     Фикстура для создания фильма и получения его ID.
