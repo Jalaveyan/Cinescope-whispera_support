@@ -4,14 +4,14 @@ from utils.data_generator import DataGenerator
 
 class TestAuthAPI:
 
-    def test_register_user_positive(self, api_manager: ApiManager, test_user):
+    def test_register_user_positive(self, api_manager: ApiManager, test_user, super_admin_api_manager):
         """Позитивный тест регистрации пользователя."""
-        response = api_manager.auth_api.register_user(test_user)
+        response = super_admin_api_manager.api.auth_api.register_user(test_user)
         response_data = response.json()
 
         # Проверка основных полей
         assert "id" in response_data, "ID пользователя отсутствует в ответе"
-        assert isinstance(response_data["id"], int), "ID должен быть числом"
+        assert isinstance(response_data["id"], str), "ID должен быть строкой (UUID)"
         assert response_data["email"] == test_user["email"], "Email не совпадает"
         
         # Проверка имени пользователя

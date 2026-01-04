@@ -1,13 +1,25 @@
-from constants import REGISTER_ENDPOINT, LOGIN_ENDPOINT
+from typing import Optional, List, Any
+
+from constants.constants import REGISTER_ENDPOINT, LOGIN_ENDPOINT
 from custom_requester.custom_requester import CustomRequester
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class AuthAPI(CustomRequester):
+class AuthAPI(CustomRequester, BaseModel):
     """
           Класс для работы с аутентификацией.
           """
+    model_config = ConfigDict(arbitrary_types_allowed=True, extra='allow')
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    password: Optional[str] = None
+    passwordRepeat: Optional[str] = None
+    roles: List[str] = Field(default_factory=list)
+
+    session: Any = None
 
     def __init__(self, session):
+        BaseModel.__init__(self)
         super().__init__(session=session, base_url="https://auth.dev-cinescope.coconutqa.ru/")
 
     def register_user(self, user_data, expected_status=201):
@@ -24,7 +36,7 @@ class AuthAPI(CustomRequester):
             expected_status=expected_status
         )
 
-    def login_user(self, login_data, expected_status=200):
+    def login_user(self, login_data, expected_status=201):
         """
         Авторизация пользователя.
         :param login_data: Данные для логина.
@@ -37,10 +49,10 @@ class AuthAPI(CustomRequester):
             expected_status=expected_status
         )
 
-    def authenticate(self, user_creds):
+    def authenticate(self, creds):
         login_data = {
-            "email": user_creds[0],
-            "password": user_creds[1]
+            "email": creds[0],
+            "password": creds[1]
         }
 
         response = self.login_user(login_data).json()

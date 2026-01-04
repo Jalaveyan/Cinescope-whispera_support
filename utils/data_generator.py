@@ -1,3 +1,4 @@
+import datetime
 import random
 import string
 import uuid
@@ -77,3 +78,30 @@ class DataGenerator:
             "genreId": random.randint(1, 10),
             "createdAt": random.choice(["asc", "desc"])
         }
+
+    # data_generator.py
+    """
+    Добавим метод в DataGenerator который сразу делает рандомные данные
+    которые можно сразу передать в метод создания юзера через БД
+    """
+
+    @staticmethod
+    def generate_user_data() -> dict:
+        """Генерирует данные для тестового пользователя"""
+        from uuid import uuid4
+
+        return {
+            'id': f'{uuid4()}',  # генерируем UUID как строку
+            'email': DataGenerator.generate_random_email(),
+            'full_name': DataGenerator.generate_random_name(),
+            'password': DataGenerator.generate_random_password(),
+            'created_at': datetime.datetime.now(),
+            'updated_at': datetime.datetime.now(),
+            'verified': False,
+            'banned': False,
+            'roles': '{USER}'
+        }
+
+    @classmethod
+    def generate_random_int(cls, param):
+        pass

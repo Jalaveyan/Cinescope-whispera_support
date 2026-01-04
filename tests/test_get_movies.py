@@ -1,3 +1,5 @@
+import pytest
+
 from api.api_manager import ApiManager
 
 
@@ -12,6 +14,13 @@ class TestGetMovies:
         assert "page" in response_data, "В ответе отсутствует ключ 'page'."
         assert isinstance(response_data["movies"], list), "Поле 'movies' не является списком."
 
+    @pytest.mark.parametrize("movie_filters", [
+        {"minPrice": 100, "maxPrice": 1000},
+        {"locations": ["MSK"]},
+        {"published": True},
+        {"genreId": 2},
+        {"page": 1, "count": 5}
+    ])
     def test_get_movies_with_filters(self, api_manager: ApiManager, super_admin_api_manager, movie_filters):
         """Тест получения списка фильмов с применением фильтров."""
         response = api_manager.movies_api.get_movies(params=movie_filters)
@@ -46,6 +55,7 @@ class TestGetMovies:
                 if "genreId" in movie and "genreId" in movie_filters:
                     assert movie["genreId"] == movie_filters["genreId"], \
                         f"Фильтр genreId не применен: {movie['genreId']} != {movie_filters['genreId']}"
+
 
     def test_get_movie_by_id_positive(self, api_manager: ApiManager, created_movie):
         """Позитивный тест получения фильма по ID."""
