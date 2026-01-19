@@ -37,7 +37,7 @@ def unauthorized_api_manager():
     yield api_mgr
     session_object.close()
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def test_user():
 
     random_password = DataGenerator.generate_random_password()
@@ -52,13 +52,49 @@ def test_user():
 
 
 @pytest.fixture(scope="session")
-def registered_user(api_manager, test_user):
+def ui_test_user():
     """
-    Фикстура для зарегистрированного пользователя.
+    Фиксированные данные для UI тестов регистрации и логина.
+    Scope="session" чтобы данные были одинаковы для всей сессии тестов.
     """
-    # Пытаемся зарегистрировать, но если пользователь уже существует (409) - это нормально
-    api_manager.auth_api.register_user(test_user, expected_status=[201, 409])
-    return test_user
+    random_password = DataGenerator.generate_random_password()
+    random_email = DataGenerator.generate_random_email()
+    random_name = DataGenerator.generate_random_name()
+    
+    return {
+        "email": random_email,
+        "fullName": random_name,
+        "password": random_password,
+        "passwordRepeat": random_password,
+        "roles": [Roles.USER.value]
+    }
+
+
+@pytest.fixture(scope="session")
+def verified_ui_user(super_admin_api_manager, ui_test_user):
+    """
+    Создаёт верифицированного пользователя через admin API для UI теста логина.
+    """
+    user_data = ui_test_user.copy()
+    user_data["verified"] = True
+    user_data["banned"] = False
+    
+    super_admin_api_manager.api.user_api.create_user(user_data)
+    return ui_test_user
+
+@pytest.fixture(scope="function")
+def registered_user(super_admin_api_manager, test_user):
+    """
+    Фикстура для зарегистрированного и верифицированного пользователя.
+    Использует admin API для создания пользователя с verified=True.
+    """
+    user_data = test_user.copy()
+    user_data["verified"] = True
+    user_data["banned"] = False
+    
+    # Создаём пользователя через admin API (уже верифицированный)
+    super_admin_api_manager.api.user_api.create_user(user_data)
+    return test_user  # Возвращаем оригинальные данные с паролем
 
 
 
