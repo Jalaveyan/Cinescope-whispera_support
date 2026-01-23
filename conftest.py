@@ -245,30 +245,7 @@ def created_test_user(db_helper):
     if db_helper.get_user_by_id(user.id):
         db_helper.delete_user(user)
 
-    @pytest.fixture  # была добавлена в файл conftest.py
-    def delay_between_retries():
-        time.sleep(2)  # Задержка в 2 секунды\ это не обязательно но
-        yield  # нужно понимать что такая возможность имеется
-
-@pytest.fixture(scope="session")
-def browser(playwright):
-    browser = playwright.chromium.launch(headless=True)
-    yield browser
-    browser.close()
-
-@pytest.fixture(scope="function")
-def context(browser):
-    context = browser.new_context()
-    context.tracing.start(screenshots=True, snapshots=True, sources=True)  # Трассировка для отладки
-    context.set_default_timeout(DEFAULT_UI_TIMEOUT)
-    yield context
-    log_name = f"trace_{Tools.get_timestamp()}.log"
-    trace_path = Tools.files_dir('playwright_trace', log_name)
-    context.tracing.stop(path=trace_path)
-    context.close()
-
-@pytest.fixture(scope="function")
-def page(context):
-    page = context.new_page()
-    yield page
-    page.close()
+@pytest.fixture
+def delay_between_retries():
+    time.sleep(2)
+    yield

@@ -1,10 +1,8 @@
-import time
-
 import allure
 import pytest
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect
 
-from models.page_object_models import CinescopRegisterPage
+from pages.registration_page import CinescopRegisterPage
 from utils.data_generator import DataGenerator
 
 
@@ -14,7 +12,7 @@ from utils.data_generator import DataGenerator
 class TestRegisterPage:
     
     @allure.title("Проведение успешной регистрации")
-    def test_register_by_ui(self):
+    def test_register_by_ui(self, page):
         """
         Регистрация пользователя через UI.
         """
@@ -23,17 +21,13 @@ class TestRegisterPage:
         password = DataGenerator.generate_random_password()
         full_name = DataGenerator.generate_random_name()
         
-        with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=False)
-            page = browser.new_page()
+        register_page = CinescopRegisterPage(page)
+        register_page.open()
+        register_page.register(full_name, email, password, password)
 
-            register_page = CinescopRegisterPage(page)
-            register_page.open()
-            register_page.register(full_name, email, password, password)
+        expect(page).to_have_url(f"{register_page.home_url}login", timeout=30000)
+        
+        alert_locator = register_page.get_notification_locator("Подтвердите свою почту")
+        expect(alert_locator).to_be_visible(timeout=10000)
 
-            register_page.assert_was_redirect_to_login_page()
-            register_page.make_screenshot_and_attach_to_allure()
-            register_page.assert_allert_was_pop_up()
-
-            time.sleep(3)
-            browser.close()
+        register_page.make_screenshot_and_attach_to_allure()

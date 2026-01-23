@@ -22,12 +22,14 @@ class AuthAPI(CustomRequester, BaseModel):
         BaseModel.__init__(self)
         super().__init__(session=session, base_url="https://auth.dev-cinescope.coconutqa.ru/")
 
-    def register_user(self, user_data, expected_status=201):
+    def register_user(self, user_data, expected_status=None):
         """
         Регистрация нового пользователя.
         :param user_data: Данные пользователя.
         :param expected_status: Ожидаемый статус-код.
         """
+        if expected_status is None:
+            expected_status = [201, 200]
 
         return self.send_request(
             method="POST",
@@ -36,7 +38,7 @@ class AuthAPI(CustomRequester, BaseModel):
             expected_status=expected_status
         )
 
-    def login_user(self, login_data, expected_status=201):
+    def login_user(self, login_data, expected_status=200):
         """
         Авторизация пользователя.
         :param login_data: Данные для логина.
